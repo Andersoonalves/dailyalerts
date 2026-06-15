@@ -24,6 +24,8 @@
     info: '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>',
     warning: '<svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>',
     download: '<svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>',
+    add_to_home_screen: '<svg viewBox="0 0 24 24"><path d="M18 1.01L8 1c-1.1 0-2 .9-2 2v3h2V5h10v14H8v-1H6v3c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM10 15h2V8H5v2h3.59L3 15.59 4.41 17 10 11.41z"/></svg>',
+    notifications: '<svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>',
   };
 
   function injectIcons() {
@@ -132,11 +134,18 @@
 
   // ===== PWA INSTALL =====
   let deferredPrompt = null;
+  let installModalShown = false;
+
   function setupPWAInstall() {
+    // Listen for the browser's install prompt
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
-      showInstallBanner();
+
+      // If first visit, show the install modal
+      if (!installModalShown && isFirstVisit()) {
+        showInstallModal();
+      }
     });
 
     window.addEventListener('appinstalled', () => {
@@ -144,61 +153,65 @@
       hideInstallBanner();
       showToast('DailyAlerts instalado! 🎉', 'success');
     });
+
+    // Show install modal on first visit even if beforeinstallprompt hasn't fired yet
+    // (some browsers — especially mobile — fire it after a delay)
+    setTimeout(() => {
+      if (!installModalShown && isFirstVisit() && deferredPrompt) {
+        showInstallModal();
+      }
+    }, 2000);
   }
 
-  function showInstallBanner() {
-    if (document.getElementById('pwaInstallBanner')) return;
-    const banner = document.createElement('div');
-    banner.id = 'pwaInstallBanner';
-    banner.className = 'pwa-install-banner';
-    banner.innerHTML = `
-      <div class="pwa-install-content">
-        <span class="material-icons-round">download</span>
-        <div class="pwa-install-text">
-          <strong>Instalar DailyAlerts</strong>
-          <span>Adicione à tela inicial para alertas mais rápidos</span>
-        </div>
-        <button class="btn btn-sm btn-primary" id="pwaInstallBtn">Instalar</button>
-        <button class="btn btn-sm btn-icon" id="pwaDismissBtn" aria-label="Fechar">
-          <span class="material-icons-round">close</span>
-        </button>
-      </div>`;
-    document.body.appendChild(banner);
+  function isFirstVisit() {
+    const visited = localStorage.getItem('pa_visited');
+    if (!visited) {
+      localStorage.setItem('pa_visited', Date.now().toString());
+      return true;
+    }
+    return false;
+  }
 
-    // Inject the icon
-    setTimeout(() => {
-      banner.querySelectorAll('.material-icons-round').forEach(el => {
-        const name = el.textContent.trim();
-        if (ICONS[name]) el.innerHTML = ICONS[name];
-      });
-    }, 0);
+  function showInstallModal() {
+    if (installModalShown) return;
+    installModalShown = true;
+    const modal = document.getElementById('installModal');
+    if (!modal) return;
+    modal.classList.add('active');
+    injectIcons();
 
-    document.getElementById('pwaInstallBtn').addEventListener('click', async () => {
-      if (!deferredPrompt) return;
+    document.getElementById('installLaterBtn').addEventListener('click', () => {
+      closeModal('installModal');
+    });
+
+    document.getElementById('installNowBtn').addEventListener('click', async () => {
+      closeModal('installModal');
+      if (!deferredPrompt) {
+        // Fallback: show browser's native prompt or instructions
+        showBannerInstallInstructions();
+        return;
+      }
       deferredPrompt.prompt();
       const result = await deferredPrompt.userChoice;
       if (result.outcome === 'accepted') {
-        hideInstallBanner();
+        showToast('Instalando... 🎉', 'success');
       }
       deferredPrompt = null;
     });
-
-    document.getElementById('pwaDismissBtn').addEventListener('click', () => {
-      hideInstallBanner();
-      // Don't show again for 7 days
-      localStorage.setItem('pa_dismissed', Date.now().toString());
-    });
-
-    // Don't show if dismissed in last 7 days
-    const dismissed = localStorage.getItem('pa_dismissed');
-    if (dismissed && Date.now() - parseInt(dismissed, 10) < 7 * 24 * 3600 * 1000) {
-      banner.remove();
-    }
   }
 
-  function hideInstallBanner() {
-    const banner = document.getElementById('pwaInstallBanner');
-    if (banner) banner.remove();
+  function showBannerInstallInstructions() {
+    // For browsers that don't support beforeinstallprompt
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    const isIOSSafari = /iPad|iPhone|iPod/.test(navigator.userAgent) && isSafari;
+
+    if (isIOSSafari) {
+      showToast('📱 Toque em Compartilhar → "Adicionar à Tela Inicial"', 'info');
+    } else if (isSafari) {
+      showToast('📱 Use o menu do Safari → "Adicionar à Dock"', 'info');
+    } else {
+      showToast('📱 Use o menu do navegador → "Instalar app"', 'info');
+    }
   }
 
   // ===== LOAD / SAVE =====

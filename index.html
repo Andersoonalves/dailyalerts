@@ -319,6 +319,42 @@
     <div class="toast-container" id="toastContainer"></div>
   </div>
 
+  <!-- Modal: Install PWA (first visit) -->
+  <div class="modal-overlay" id="installModal">
+    <div class="modal modal-sm install-modal">
+      <div class="install-modal-header">
+        <div class="install-icon">
+          <span class="material-icons-round">notifications_active</span>
+        </div>
+        <h3>Instale o DailyAlerts</h3>
+        <p>Tenha acesso rápido aos seus lembretes de água e remédios direto da tela inicial!</p>
+      </div>
+      <div class="install-modal-body">
+        <div class="install-steps">
+          <div class="install-step">
+            <span class="install-step-icon"><span class="material-icons-round">download</span></span>
+            <span class="install-step-text">Toque em <strong>Instalar</strong> abaixo</span>
+          </div>
+          <div class="install-step">
+            <span class="install-step-icon"><span class="material-icons-round">add_to_home_screen</span></span>
+            <span class="install-step-text">Confirme a instalação</span>
+          </div>
+          <div class="install-step">
+            <span class="install-step-icon"><span class="material-icons-round">notifications</span></span>
+            <span class="install-step-text">Receba alertas mesmo com o app fechado</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer install-modal-footer">
+        <button class="btn btn-secondary" id="installLaterBtn">Depois</button>
+        <button class="btn btn-primary" id="installNowBtn">
+          <span class="material-icons-round">download</span>
+          Instalar agora
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script src="js/app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {

@@ -1048,3 +1048,161 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* ===== ALERT BANNER ===== */
+.alert-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  padding: 12px 16px;
+  animation: bannerSlideIn 0.4s ease;
+  pointer-events: auto;
+}
+
+.alert-banner.water {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.95), rgba(5, 150, 105, 0.95));
+  color: #fff;
+  backdrop-filter: blur(10px);
+}
+
+.alert-banner.medicine {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.95), rgba(37, 99, 235, 0.95));
+  color: #fff;
+  backdrop-filter: blur(10px);
+}
+
+.alert-banner-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.alert-banner-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.alert-banner-text strong {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.alert-banner-text span {
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.alert-banner-dismiss {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.alert-banner-dismiss:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.alert-banner-dismiss .material-icons-round {
+  font-size: 18px;
+}
+
+@keyframes bannerSlideIn {
+  from { transform: translateY(-100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Push main content down when banner is present */
+.alert-banner ~ .main {
+  padding-top: 20px;
+}
+
+/* ===== PWA INSTALL BANNER ===== */
+.pwa-install-banner {
+  position: fixed;
+  bottom: 70px;
+  left: 12px;
+  right: 12px;
+  z-index: 900;
+  background: var(--bg-card);
+  -webkit-backdrop-filter: var(--glass-blur-strong);
+  backdrop-filter: var(--glass-blur-strong);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  padding: 12px 14px;
+  animation: bannerSlideUp 0.4s ease;
+}
+
+.pwa-install-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pwa-install-content > .material-icons-round:first-child {
+  color: var(--primary-500);
+  flex-shrink: 0;
+}
+
+.pwa-install-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+}
+
+.pwa-install-text strong {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.pwa-install-text span {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.btn-sm {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.08);
+  color: var(--text-secondary);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+@keyframes bannerSlideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}

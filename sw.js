@@ -3,16 +3,16 @@
    Cache-first para funcionamento offline
    ===================================================== */
 
-const CACHE_NAME = 'dailyalerts-v1';
-const BASE = '/dailyalerts/';
+const CACHE_NAME = 'dailyalerts-v2';
 const ASSETS = [
-  BASE,
-  BASE + 'index.html',
-  BASE + 'css/styles.css',
-  BASE + 'js/app.js',
-  BASE + 'manifest.json',
-  BASE + 'icons/icon-192.png',
-  BASE + 'icons/icon-512.png',
+  './',
+  './index.html',
+  './css/styles.css',
+  './js/app.js',
+  './manifest.json',
+  './sw.js',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
 ];
 
 // Install: cache all assets
@@ -48,10 +48,26 @@ self.addEventListener('fetch', (event) => {
       });
     }).catch(() => {
       if (event.request.destination === 'document') {
-        return caches.match(BASE + 'index.html');
+        return caches.match('./index.html');
       }
     })
   );
+});
+
+// Handle push messages (for future use)
+self.addEventListener('push', (event) => {
+  if (event.data) {
+    const data = event.data.json();
+    event.waitUntil(
+      self.registration.showNotification(data.title || 'DailyAlerts', {
+        body: data.body || 'Você tem um lembrete!',
+        icon: './icons/icon-192.png',
+        badge: './icons/icon-192.png',
+        vibrate: [200, 100, 200],
+        tag: data.tag || 'dailyalerts',
+      })
+    );
+  }
 });
 
 // Handle notification clicks
@@ -62,7 +78,7 @@ self.addEventListener('notificationclick', (event) => {
       if (clientList.length > 0) {
         clientList[0].focus();
       } else {
-        clients.openWindow(BASE);
+        clients.openWindow('./');
       }
     })
   );

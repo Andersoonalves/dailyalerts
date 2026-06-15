@@ -2,7 +2,7 @@
   "name": "DailyAlerts",
   "short_name": "DailyAlerts",
   "description": "Alertas diários de água e remédios",
-  "start_url": "/index.html",
+  "start_url": "/dailyalerts/",
   "display": "standalone",
   "background_color": "#f0f5fa",
   "theme_color": "#3b82f6",

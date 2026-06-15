@@ -4,14 +4,15 @@
    ===================================================== */
 
 const CACHE_NAME = 'dailyalerts-v1';
+const BASE = '/dailyalerts/';
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/css/styles.css',
-  '/js/app.js',
-  '/manifest.json',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png',
+  BASE,
+  BASE + 'index.html',
+  BASE + 'css/styles.css',
+  BASE + 'js/app.js',
+  BASE + 'manifest.json',
+  BASE + 'icons/icon-192.png',
+  BASE + 'icons/icon-512.png',
 ];
 
 // Install: cache all assets
@@ -39,7 +40,6 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((cached) => {
       return cached || fetch(event.request).then((response) => {
-        // Cache new requests
         if (response.ok && event.request.method === 'GET') {
           const clone = response.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
@@ -47,9 +47,8 @@ self.addEventListener('fetch', (event) => {
         return response;
       });
     }).catch(() => {
-      // Fallback for offline
       if (event.request.destination === 'document') {
-        return caches.match('/index.html');
+        return caches.match(BASE + 'index.html');
       }
     })
   );
@@ -63,7 +62,7 @@ self.addEventListener('notificationclick', (event) => {
       if (clientList.length > 0) {
         clientList[0].focus();
       } else {
-        clients.openWindow('/');
+        clients.openWindow(BASE);
       }
     })
   );

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0ea5e9">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="DailyAlerts">
+  <meta name="description" content="Alertas diários de água e remédios">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <style>
+    /* Inline icons as fallback */
+    .material-icons-round { font-family: 'Material Icons Round', sans-serif; font-size: inherit; }
+  </style>
+  <link rel="stylesheet" href="css/styles.css">
+  <title>DailyAlerts</title>
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-content">
+        <div class="logo">
+          <div class="logo-icon">
+            <span class="material-icons-round">notifications_active</span>
+          </div>
+          <div class="logo-text">
+            <h1>DailyAlerts</h1>
+            <span class="subtitle">Seus lembretes diários</span>
+          </div>
+        </div>
+        <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema">
+          <span class="material-icons-round">dark_mode</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+      <!-- Greeting -->
+      <section class="greeting">
+        <h2 id="greetingText">Bom dia! ☀️</h2>
+        <p id="greetingSubtext">Vamos cuidar da sua saúde</p>
+      </section>
+
+      <!-- Quick Stats -->
+      <section class="stats">
+        <div class="stat-card water">
+          <div class="stat-icon">
+            <span class="material-icons-round">water_drop</span>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value" id="waterCount">0ml</span>
+            <span class="stat-label">Água hoje</span>
+          </div>
+          <div class="stat-progress">
+            <div class="stat-progress-bar" id="waterProgress" style="width: 0%"></div>
+          </div>
+        </div>
+        <div class="stat-card medicine">
+          <div class="stat-icon">
+            <span class="material-icons-round">medication</span>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value" id="medicineCount">0/0</span>
+            <span class="stat-label">Remédios</span>
+          </div>
+          <div class="stat-progress">
+            <div class="stat-progress-bar" id="medicineProgress" style="width: 0%"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Action Buttons -->
+      <section class="actions">
+        <button class="action-btn water-btn" id="addWaterBtn">
+          <span class="material-icons-round">add</span>
+          Beber água
+        </button>
+        <button class="action-btn medicine-btn" id="takeMedicineBtn">
+          <span class="material-icons-round">check_circle</span>
+          Registrar remédio
+        </button>
+      </section>
+
+      <!-- Tabs -->
+      <section class="tabs-section">
+        <div class="tabs">
+          <button class="tab active" data-tab="water">
+            <span class="material-icons-round">water_drop</span>
+            Água
+          </button>
+          <button class="tab" data-tab="medicine">
+            <span class="material-icons-round">medication</span>
+            Remédios
+          </button>
+        </div>
+
+        <!-- Water Tab -->
+        <div class="tab-content active" id="waterTab">
+          <div class="section-header">
+            <h3>💧 Controle de Água</h3>
+            <button class="btn-add" id="addWaterAlertBtn">
+              <span class="material-icons-round">add_alarm</span>
+              Novo alerta
+            </button>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Meta diária</span>
+              <span class="card-value" id="waterGoalDisplay">2000ml</span>
+            </div>
+            <div class="water-goal-slider">
+              <input type="range" id="waterGoalSlider" min="500" max="5000" step="250" value="2000">
+              <div class="slider-labels">
+                <span>500ml</span>
+                <span>5000ml</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Alertas de água</span>
+            </div>
+            <div class="alert-list" id="waterAlertList">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Histórico de hoje</span>
+            </div>
+            <div class="history-list" id="waterHistoryList">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Medicine Tab -->
+        <div class="tab-content" id="medicineTab">
+          <div class="section-header">
+            <h3>💊 Controle de Remédios</h3>
+            <button class="btn-add" id="addMedicineAlertBtn">
+              <span class="material-icons-round">add_alarm</span>
+              Novo remédio
+            </button>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Lembretes de remédios</span>
+            </div>
+            <div class="alert-list" id="medicineAlertList">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Histórico de hoje</span>
+            </div>
+            <div class="history-list" id="medicineHistoryList">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-nav="home">
+        <span class="material-icons-round">home</span>
+        <span>Início</span>
+      </button>
+      <button class="nav-item" data-nav="water">
+        <span class="material-icons-round">water_drop</span>
+        <span>Água</span>
+      </button>
+      <button class="nav-item center-btn" data-nav="add">
+        <span class="material-icons-round">add_circle</span>
+      </button>
+      <button class="nav-item" data-nav="medicine">
+        <span class="material-icons-round">medication</span>
+        <span>Remédios</span>
+      </button>
+      <button class="nav-item" data-nav="settings">
+        <span class="material-icons-round">settings</span>
+        <span>Ajustes</span>
+      </button>
+    </nav>
+
+    <!-- Modal: Add Water Alert -->
+    <div class="modal-overlay" id="waterAlertModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>Novo Alerta de Água</h3>
+          <button class="modal-close" data-close="waterAlertModal">
+            <span class="material-icons-round">close</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Hora do lembrete</label>
+            <input type="time" id="waterAlertTime" value="08:00">
+          </div>
+          <div class="form-group">
+            <label>Quantidade (ml)</label>
+            <input type="number" id="waterAlertAmount" value="250" min="50" max="1000" step="50">
+          </div>
+          <div class="form-group">
+            <label>Mensagem</label>
+            <input type="text" id="waterAlertMessage" value="Hora de beber água! 💧" placeholder="Sua mensagem...">
+          </div>
+          <div class="form-group">
+            <label>Dias</label>
+            <div class="day-selector">
+              <button class="day-btn active" data-day="0">D</button>
+              <button class="day-btn active" data-day="1">S</button>
+              <button class="day-btn active" data-day="2">T</button>
+              <button class="day-btn active" data-day="3">Q</button>
+              <button class="day-btn active" data-day="4">Q</button>
+              <button class="day-btn active" data-day="5">S</button>
+              <button class="day-btn active" data-day="6">S</button>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-close="waterAlertModal">Cancelar</button>
+          <button class="btn btn-primary" id="saveWaterAlertBtn">Salvar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Add Medicine Alert -->
+    <div class="modal-overlay" id="medicineAlertModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>Novo Remédio</h3>
+          <button class="modal-close" data-close="medicineAlertModal">
+            <span class="material-icons-round">close</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Nome do remédio</label>
+            <input type="text" id="medicineName" placeholder="Ex: Paracetamol">
+          </div>
+          <div class="form-group">
+            <label>Hora do lembrete</label>
+            <input type="time" id="medicineAlertTime" value="08:00">
+          </div>
+          <div class="form-group">
+            <label>Dosagem</label>
+            <input type="text" id="medicineDosage" placeholder="Ex: 1 comprimido">
+          </div>
+          <div class="form-group">
+            <label>Mensagem</label>
+            <input type="text" id="medicineAlertMessage" value="Hora do remédio! 💊" placeholder="Sua mensagem...">
+          </div>
+          <div class="form-group">
+            <label>Dias</label>
+            <div class="day-selector">
+              <button class="day-btn active" data-day="0">D</button>
+              <button class="day-btn active" data-day="1">S</button>
+              <button class="day-btn active" data-day="2">T</button>
+              <button class="day-btn active" data-day="3">Q</button>
+              <button class="day-btn active" data-day="4">Q</button>
+              <button class="day-btn active" data-day="5">S</button>
+              <button class="day-btn active" data-day="6">S</button>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-close="medicineAlertModal">Cancelar</button>
+          <button class="btn btn-primary" id="saveMedicineAlertBtn">Salvar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Quick Add Water -->
+    <div class="modal-overlay" id="quickWaterModal">
+      <div class="modal modal-sm">
+        <div class="modal-header">
+          <h3>Beber Água 💧</h3>
+          <button class="modal-close" data-close="quickWaterModal">
+            <span class="material-icons-round">close</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="quick-amounts">
+            <button class="quick-amount" data-amount="100">100ml</button>
+            <button class="quick-amount" data-amount="200">200ml</button>
+            <button class="quick-amount active" data-amount="250">250ml</button>
+            <button class="quick-amount" data-amount="300">300ml</button>
+            <button class="quick-amount" data-amount="500">500ml</button>
+          </div>
+          <div class="form-group">
+            <label>Quantidade personalizada (ml)</label>
+            <input type="number" id="customWaterAmount" value="250" min="10" max="2000" step="10">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-close="quickWaterModal">Cancelar</button>
+          <button class="btn btn-primary" id="confirmWaterBtn">Registrar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-container" id="toastContainer"></div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    }
+  </script>
+</body>
+</html>
